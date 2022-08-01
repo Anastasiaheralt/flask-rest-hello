@@ -17,3 +17,49 @@ class User(db.Model):
             "email": self.email,
             # do not serialize the password, its a security breach
         }
+
+class Diario(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(48), nullable=False)
+    autor = db.Column(db.String(48))
+
+    def __init__(self, nombre, autor):
+        self.nombre = nombre
+        self.autor = autor
+
+    @classmethod
+    def new_diary(cls, nombre, autor):
+        new_diary = cls(nombre, autor)
+        db.session.add(new_diary)
+        try:
+            db.session.commit()
+            return new_diary
+        except Exception as error:
+            print(error)
+            return None
+
+    def update(self, nombre, autor):
+        self.nombre = nombre
+        self.autor = autor
+        try:
+            db.session.commit()
+            return self
+        except Exception as error:
+            print(error)
+            return False
+
+    def delete(self):
+        db.session.delete(self)
+        try:
+            db.session.commit()
+            return True
+        except Exception as error:
+            print(error)
+            return False
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "nombre": self.nombre,
+            "autor": self.autor
+        }
